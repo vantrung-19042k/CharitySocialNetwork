@@ -47,7 +47,7 @@ class PostSerializer(ModelSerializer):
         fields = ['title', 'content', 'created_date', 'updated_date', 'image', 'tags', 'author']
 
 
-class ReportSerialier(ModelSerializer):
+class ReportSerializer(ModelSerializer):
     user_create_report = UserSerializer()
     user_is_reported = UserSerializer()
 

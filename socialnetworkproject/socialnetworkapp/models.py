@@ -41,6 +41,9 @@ class Post(models.Model):
     def count_comments(self):
         return self.comment_set.all().count
 
+    class Meta:
+        ordering = ['-created_date']
+
 
 LIKE_CHOICES = (
     ('Like', 'Like'),

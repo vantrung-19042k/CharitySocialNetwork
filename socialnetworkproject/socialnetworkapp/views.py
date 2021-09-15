@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
@@ -38,14 +39,19 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
 
-class PostViewSet(viewsets.ModelViewSet):
+class PostPagination(PageNumberPagination):
+    page_size = 1
+
+
+class PostViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    pagination_class = PostPagination
 
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
-    serializer_class = ReportSerialier
+    serializer_class = ReportSerializer
 
 
 class AuctionItemViewSet(viewsets.ModelViewSet):
