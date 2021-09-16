@@ -43,8 +43,21 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
 
+    # oauth2
+    'oauth2_provider',
+
 
 ]
+
+
+REST_FRAMEWORK = {
+
+    # oauth2
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -8,11 +8,12 @@ from rest_framework.response import Response
 from .serializers import *
 
 
-class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.RetrieveAPIView):
+class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, ]
 
+    # check user info to get detail user info
     def get_permissions(self):
         if self.action == 'retrieve':
             return [permissions.IsAuthenticated()]
