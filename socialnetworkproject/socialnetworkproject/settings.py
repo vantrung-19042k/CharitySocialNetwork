@@ -58,6 +58,16 @@ REST_FRAMEWORK = {
     ),
 }
 
+OAUTH2_INFO = {
+    "client_id": "5aWq05nCyCKEtQD8TGPlIMuk6RW5XYOWf9phIq9q",
+    "client_secret": "Asllx0IlBm8MtFKm4bVrTjLAtZzAHVfqC5s2Bo3mrxuj6hfChT2r6LjeGSAE3BIQFHGGkqv7Bc5l8NRufT63BTwLpM4jMvoONIlMhpTjdSXG4NDl8rWHmcZeX1OPKJhe",
+}
+
+
+# OAUTH2_PROVIDER = {
+#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+# }
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
