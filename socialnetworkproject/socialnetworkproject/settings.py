@@ -96,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'charitysocialnetwork',
         'USER': 'root',
-        'PASSWORD': '12345678',
+        'PASSWORD': 'Thienphuc2707',
         'HOST': ''
     }
 }
