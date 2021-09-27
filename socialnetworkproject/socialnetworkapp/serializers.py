@@ -26,10 +26,10 @@ class TagSerializer(ModelSerializer):
         fields = ["id", "name"]
 
 
-class LikeSerializer(ModelSerializer):
+class ActionSerializer(ModelSerializer):
     class Meta:
-        model = Like
-        fields = ['value', 'updated_date', 'user', 'post']
+        model = Action
+        fields = ['type', 'updated_date', 'user', 'post']
 
 
 class CommentSerializer(ModelSerializer):

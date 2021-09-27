@@ -32,13 +32,13 @@ class TagAdmin(admin.ModelAdmin):
     inlines = [TagInlinePostAdmin, ]
 
 
-class LikeInlinePostAdmin(admin.StackedInline):
-    model = Like
+class ActionInlinePostAdmin(admin.StackedInline):
+    model = Action
     fk_name = 'post'
 
 
-class LikeAdmin(admin.ModelAdmin):
-    list_display = ['updated_date', 'created_date', 'value', 'user', 'post']
+class ActionAdmin(admin.ModelAdmin):
+    list_display = ['updated_date', 'created_date', 'type', 'user', 'post']
 
 
 class CommentInlinePostAdmin(admin.StackedInline):
@@ -60,7 +60,7 @@ class PostContentForm(forms.ModelForm):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'content', 'created_date', 'updated_date', 'image', 'author']
-    inlines = [TagInlinePostAdmin, LikeInlinePostAdmin, CommentInlinePostAdmin]
+    inlines = [TagInlinePostAdmin, ActionInlinePostAdmin, CommentInlinePostAdmin]
     form = PostContentForm
 
 
@@ -79,7 +79,7 @@ class TransactionAdmin(admin.ModelAdmin):
 admin_site.register(User, UserAdmin)
 admin_site.register(Post, PostAdmin)
 admin_site.register(Tag, TagAdmin)
-admin_site.register(Like, LikeAdmin)
+admin_site.register(Action, ActionAdmin)
 admin_site.register(Comment, CommentAdmin)
 admin_site.register(Report)
 admin_site.register(AuctionItem)

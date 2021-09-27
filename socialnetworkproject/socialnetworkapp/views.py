@@ -38,9 +38,9 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
 
 
-class LikeViewSet(viewsets.ModelViewSet):
-    queryset = Like.objects.all()
-    serializer_class = LikeSerializer
+class ActionViewSet(viewsets.ModelViewSet):
+    queryset = Action.objects.all()
+    serializer_class = Action
 
 
 class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):

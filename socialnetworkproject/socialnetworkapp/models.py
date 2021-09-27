@@ -51,16 +51,31 @@ LIKE_CHOICES = (
 )
 
 
-class Like(models.Model):
-    value = models.CharField(choices=LIKE_CHOICES, max_length=8)
+class ActionBase(models.Model):
+    class Meta:
+        abstract = True
+
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+
+class Action(ActionBase):
+    LIKE, HEART, HAHA, WOW = range(4)
+
+    ACTIONS = {
+        (LIKE, 'Like'),
+        (HEART, 'Heart'),
+        (HAHA, 'Haha'),
+        (WOW, 'Wow'),
+    }
+    type = models.PositiveSmallIntegerField(choices=ACTIONS, default=LIKE)
+    active = models.BooleanField(default=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user}-{self.post}-{self.value}"
+        return f"{self.user}-{self.post}-{self.type}"
 
 
 class Comment(models.Model):
@@ -106,4 +121,3 @@ class Transaction(models.Model):
     last_price = models.FloatField(null=True, blank=True)
 
     user_buy = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-

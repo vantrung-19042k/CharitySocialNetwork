@@ -15,7 +15,7 @@ from drf_yasg.views import get_schema_view
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='user')
 router.register('tags', views.TagViewSet, basename='tag')
-router.register('likes', views.LikeViewSet, basename='like')
+router.register('actions', views.ActionViewSet, basename='action')
 router.register('comments', views.CommentViewSet, basename='comment')
 router.register('posts', views.PostViewSet, basename='post')
 router.register('posts', views.PostListViewSet, basename='post')
