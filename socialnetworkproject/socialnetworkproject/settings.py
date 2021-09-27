@@ -45,8 +45,6 @@ INSTALLED_APPS = [
 
     # oauth2
     'oauth2_provider',
-
-
 ]
 
 

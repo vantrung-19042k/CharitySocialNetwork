@@ -48,7 +48,7 @@ urlpatterns = [
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     # oauth2
-    re_path(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    re_path(r'^auth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
     # defind end_point to get client_id and client_secret
     path('oauth2-info/', views.AuthInfo.as_view())

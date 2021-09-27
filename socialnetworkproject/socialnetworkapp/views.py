@@ -48,13 +48,33 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class PostPagination(PageNumberPagination):
-    page_size = 1
+    page_size = 2
 
 
 class PostViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = PostPagination
+
+    # permission_classes = [permissions.IsAuthenticated, ]
+
+    def get_permissions(self):
+        if self.action == 'add_comment':
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
+
+    @action(methods=['post'], detail=True, url_path='add-comment')
+    def add_comment(self, request, pk):
+        content = request.data.get('content')
+        if content:
+            c = Comment.objects.create(content=content,
+                                       post=self.get_object(),
+                                       creator=request.user)
+            return Response(CommentSerializer(c).data,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReportViewSet(viewsets.ModelViewSet):

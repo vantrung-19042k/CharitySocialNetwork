@@ -47,7 +47,7 @@ class CommentInlinePostAdmin(admin.StackedInline):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ['content', 'created_date', 'updated_date', 'user', 'post']
+    list_display = ['content', 'created_date', 'updated_date', 'creator', 'post']
 
 
 class PostContentForm(forms.ModelForm):
