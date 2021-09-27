@@ -110,6 +110,16 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=True, url_path='like')
+    def take_action(self, request, pk):
+        try:
+            action_type = int(request.date['type'])
+        except IndexError | ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            action = Action.objects.create(type=action_type, creator=request.user, post=self.get_object())
+            return Response(ActionSerializer(action).data, status=status.HTTP_200_OK)
+
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
