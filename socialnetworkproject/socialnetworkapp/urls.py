@@ -13,14 +13,15 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
 router = DefaultRouter()
-router.register('users', views.UserViewSet, basename='users')
-router.register('tags', views.TagViewSet, basename='tags')
-router.register('likes', views.LikeViewSet, basename='likes')
-router.register('comments', views.CommentViewSet, basename='comments')
-router.register('posts', views.PostViewSet, basename='posts')
-router.register('reports', views.ReportViewSet, basename='reports')
-router.register('auction_items', views.AuctionItemViewSet, basename='auction_items')
-router.register('transactions', views.TransactionViewSet, basename='transactions')
+router.register('users', views.UserViewSet, basename='user')
+router.register('tags', views.TagViewSet, basename='tag')
+router.register('likes', views.LikeViewSet, basename='like')
+router.register('comments', views.CommentViewSet, basename='comment')
+router.register('posts', views.PostViewSet, basename='post')
+router.register('posts', views.PostListViewSet, basename='post')
+router.register('reports', views.ReportViewSet, basename='report')
+router.register('auction_items', views.AuctionItemViewSet, basename='auction_item')
+router.register('transactions', views.TransactionViewSet, basename='transaction')
 
 # defind view for swagger tool
 schema_view = get_schema_view(

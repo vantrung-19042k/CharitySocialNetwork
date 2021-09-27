@@ -43,20 +43,37 @@ class LikeViewSet(viewsets.ModelViewSet):
     serializer_class = LikeSerializer
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user == self.get_object().creator:
+            return super().destroy(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def partial_update(self,request, *args, **kwargs):
+        if request.user == self.get_object().creator:
+            return super().partial_update(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 class PostPagination(PageNumberPagination):
     page_size = 2
 
 
-class PostViewSet(viewsets.ViewSet, generics.ListAPIView):
+class PostListViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     pagination_class = PostPagination
 
+
+class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def get_permissions(self):
@@ -65,7 +82,7 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView):
 
         return [permissions.AllowAny()]
 
-    @action(methods=['post'], detail=True, url_path="tags")
+    @action(methods=['post'], detail=True, url_path="add-tags")
     def add_tag(self, request, pk):
         try:
             post = self.get_object()
@@ -80,10 +97,6 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView):
                 post.save()
 
                 return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
-
-
-
-
 
     @action(methods=['post'], detail=True, url_path='add-comment')
     def add_comment(self, request, pk):

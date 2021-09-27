@@ -40,7 +40,7 @@ class CommentSerializer(ModelSerializer):
 
 class PostSerializer(ModelSerializer):
     tags = TagSerializer(many=True)
-    author = UserSerializer()
+    # author = UserSerializer()
 
     class Meta:
         model = Post
