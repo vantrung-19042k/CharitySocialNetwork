@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import Http404
 
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
@@ -63,6 +64,26 @@ class PostViewSet(viewsets.ViewSet, generics.ListAPIView):
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
+
+    @action(methods=['post'], detail=True, url_path="tags")
+    def add_tag(self, request, pk):
+        try:
+            post = self.get_object()
+        except Http404:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            tags = request.data.get("tags")
+            if tags is not None:
+                for tag in tags:
+                    t, _ = Tag.objects.get_or_create(name=tag)
+                    post.tags.add(t)
+                post.save()
+
+                return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
+
+
+
+
 
     @action(methods=['post'], detail=True, url_path='add-comment')
     def add_comment(self, request, pk):
