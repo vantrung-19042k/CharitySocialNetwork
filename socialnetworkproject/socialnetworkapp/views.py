@@ -55,7 +55,7 @@ class PostPagination(PageNumberPagination):
     page_size = 2
 
 
-class PostListViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
+class PostListCreateViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     queryset = Post.objects.filter(active=True)
     serializer_class = PostSerializer
     pagination_class = PostPagination
@@ -71,12 +71,13 @@ class PostListViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
     def create(self, request, *args, **kwargs):
         title = request.data.get('title')
         content = request.data.get('content')
+        image = request.FILES.get('image')
         creator = self.request.user
 
         if title is None or title == "" or content is None or content == "":
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            post = Post.objects.create(title=title, creator=creator, content=content)
+            post = Post.objects.create(title=title, creator=creator, content=content, image=image)
             post.save()
             return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
 

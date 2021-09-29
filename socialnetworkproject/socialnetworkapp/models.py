@@ -2,13 +2,14 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
 
-from ckeditor.fields import RichTextField
+# from ckeditor.fields import RichTextField
 
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/users/%Y/%m',
                                validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
     is_admin = models.BooleanField(default=False)
+    phone = models.CharField(max_length=11, blank=True)
 
     def __str__(self):
         return self.username
@@ -23,7 +24,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=100, blank=True)
-    content = models.TextField()
+    content = models.TextField(max_length=1000, blank=True)
     liked = models.ManyToManyField(User, blank=True, related_name='likes')
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -39,6 +40,12 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    # admin get image
+    def admin_image(self):
+        return '<img src="%s"/>' % self.image
+
+    admin_image.allow_tags = True
 
     # def num_likes(self):
     #     return self.liked.all().count()

@@ -19,7 +19,7 @@ router.register('tags', views.TagViewSet, basename='tag')
 router.register('actions', views.ActionViewSet, basename='action')
 router.register('comments', views.CommentViewSet, basename='comment')
 router.register('posts', views.PostViewSet, basename='post')
-router.register('posts', views.PostListViewSet, basename='post')
+router.register('posts', views.PostListCreateViewSet, basename='post')
 router.register('reports', views.ReportViewSet, basename='report')
 router.register('auction_items', views.AuctionItemViewSet, basename='auction_item')
 router.register('transactions', views.TransactionViewSet, basename='transaction')
@@ -56,4 +56,4 @@ urlpatterns = [
     path('oauth2-info/', views.AuthInfo.as_view())
 ]
 
-# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
