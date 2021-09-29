@@ -11,6 +11,11 @@ from rest_framework.views import APIView
 from .serializers import *
 
 
+class AuthInfo(APIView):
+    def get(self, request):
+        return Response(settings.OAUTH2_INFO, status=status.HTTP_200_OK)
+
+
 class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
@@ -28,21 +33,6 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
         return Response(self.serializer_class(request.user).data, status=status.HTTP_200_OK)
 
 
-class AuthInfo(APIView):
-    def get(self, request):
-        return Response(settings.OAUTH2_INFO, status=status.HTTP_200_OK)
-
-
-class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-
-
-class ActionViewSet(viewsets.ModelViewSet):
-    queryset = Action.objects.all()
-    serializer_class = Action
-
-
 class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -54,7 +44,7 @@ class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateA
 
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    def partial_update(self,request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         if request.user == self.get_object().creator:
             return super().partial_update(request, *args, **kwargs)
 
@@ -65,22 +55,58 @@ class PostPagination(PageNumberPagination):
     page_size = 2
 
 
-class PostListViewSet(viewsets.ViewSet, generics.ListAPIView):
-    queryset = Post.objects.all()
+class PostListViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
+    queryset = Post.objects.filter(active=True)
     serializer_class = PostSerializer
     pagination_class = PostPagination
 
-
-class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
     # permission_classes = [permissions.IsAuthenticated, ]
 
     def get_permissions(self):
-        if self.action == 'add_comment':
+        if self.action in ['create']:
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
+
+    def create(self, request, *args, **kwargs):
+        title = request.data.get('title')
+        content = request.data.get('content')
+        creator = self.request.user
+
+        if title is None or title == "" or content is None or content == "":
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            post = Post.objects.create(title=title, creator=creator, content=content)
+            post.save()
+            return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
+
+
+class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAPIView,
+                  generics.UpdateAPIView):
+    queryset = Post.objects.filter(active=True)
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def get_permissions(self):
+        if self.action in ['add_comment', 'take_action']:
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
+
+    def partial_update(self, request, *args, **kwargs):
+        if request.user == self.get_object().creator:
+            return super().partial_update(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user == self.get_object().creator:
+            post = self.get_object()
+            post.active = False
+            post.save()
+            return Response(self.serializer_class(post).data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     @action(methods=['post'], detail=True, url_path="add-tags")
     def add_tag(self, request, pk):
@@ -106,19 +132,29 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
                                        post=self.get_object(),
                                        creator=request.user)
             return Response(CommentSerializer(c).data,
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True, url_path='like')
     def take_action(self, request, pk):
         try:
-            action_type = int(request.date['type'])
+            action_type = int(request.data['type'])
         except IndexError | ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            action = Action.objects.create(type=action_type, creator=request.user, post=self.get_object())
-            return Response(ActionSerializer(action).data, status=status.HTTP_200_OK)
+            action_post = Action.objects.create(type=action_type, creator=request.user, post=self.get_object())
+            return Response(ActionSerializer(action_post).data, status=status.HTTP_200_OK)
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class ActionViewSet(viewsets.ModelViewSet):
+    queryset = Action.objects.all()
+    serializer_class = Action
 
 
 class ReportViewSet(viewsets.ModelViewSet):

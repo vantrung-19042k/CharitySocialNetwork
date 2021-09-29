@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import *
+from .models import User, Tag, Action, Comment, Post, Report, AuctionItem, Transaction
 
 
 class UserSerializer(ModelSerializer):
@@ -12,12 +12,12 @@ class UserSerializer(ModelSerializer):
             'password': {'write_only': 'true'}
         }
 
-        def create(self, validated_data):
-            user = User(**validated_data)
-            user.set_password(validated_data['password'])
-            user.save()
+    def create(self, validated_data):
+        user = User(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
 
-            return user
+        return user
 
 
 class TagSerializer(ModelSerializer):
@@ -29,7 +29,7 @@ class TagSerializer(ModelSerializer):
 class ActionSerializer(ModelSerializer):
     class Meta:
         model = Action
-        fields = ['type', 'updated_date', 'user', 'post']
+        fields = ['type', 'updated_date', 'creator', 'post']
 
 
 class CommentSerializer(ModelSerializer):
@@ -39,12 +39,12 @@ class CommentSerializer(ModelSerializer):
 
 
 class PostSerializer(ModelSerializer):
-    tags = TagSerializer(many=True)
-    # author = UserSerializer()
+    tags = TagSerializer(many=True, required=False)
+    creator = UserSerializer()
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'created_date', 'updated_date', 'image', 'tags', 'author']
+        fields = ['id', 'title', 'content', 'created_date', 'updated_date', 'image', 'active', 'tags', 'creator']
 
 
 class ReportSerializer(ModelSerializer):

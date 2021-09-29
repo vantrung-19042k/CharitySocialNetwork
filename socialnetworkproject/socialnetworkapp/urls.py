@@ -3,9 +3,10 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import permissions
+from django.contrib import admin
 
 from . import views
-from .admin import admin_site
+# from .admin import admin_site
 
 from rest_framework.routers import DefaultRouter
 
@@ -39,7 +40,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin_site.urls),
+    path('admin/', admin.site.urls),
     re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
     path('__debug__/', include(debug_toolbar.urls)),
 
@@ -55,4 +56,4 @@ urlpatterns = [
     path('oauth2-info/', views.AuthInfo.as_view())
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

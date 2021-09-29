@@ -10,7 +10,7 @@ class CharitySocialNetwork(admin.AdminSite):
     site_header = 'CHARITY SOCIAL NETWORK'
 
 
-admin_site = CharitySocialNetwork(name='charity_admin')
+# admin_site = CharitySocialNetwork(name='charity_admin')
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -38,7 +38,7 @@ class ActionInlinePostAdmin(admin.StackedInline):
 
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ['updated_date', 'created_date', 'type', 'user', 'post']
+    list_display = ['updated_date', 'created_date', 'type', 'creator', 'post']
 
 
 class CommentInlinePostAdmin(admin.StackedInline):
@@ -59,8 +59,8 @@ class PostContentForm(forms.ModelForm):
 
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'content', 'created_date', 'updated_date', 'image', 'author']
-    inlines = [TagInlinePostAdmin, ActionInlinePostAdmin, CommentInlinePostAdmin]
+    list_display = ['id', 'title', 'content', 'created_date', 'updated_date', 'image', 'active', 'creator']
+    inlines = [ActionInlinePostAdmin, CommentInlinePostAdmin]
     form = PostContentForm
 
 
@@ -76,12 +76,12 @@ class TransactionAdmin(admin.ModelAdmin):
     list_display = ['id', 'transaction_date', 'started_price', 'last_price', 'items', 'user_buy']
 
 
-admin_site.register(User, UserAdmin)
-admin_site.register(Post, PostAdmin)
-admin_site.register(Tag, TagAdmin)
-admin_site.register(Action, ActionAdmin)
-admin_site.register(Comment, CommentAdmin)
-admin_site.register(Report)
-admin_site.register(AuctionItem)
-admin_site.register(Transaction)
+admin.site.register(User, UserAdmin)
+admin.site.register(Post, PostAdmin)
+admin.site.register(Tag, TagAdmin)
+admin.site.register(Action, ActionAdmin)
+admin.site.register(Comment, CommentAdmin)
+admin.site.register(Report)
+admin.site.register(AuctionItem)
+admin.site.register(Transaction)
 

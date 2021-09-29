@@ -23,26 +23,28 @@ class Tag(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=100, blank=True)
-    content = RichTextField()
+    content = models.TextField()
     liked = models.ManyToManyField(User, blank=True, related_name='likes')
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='uploads/posts/%Y/%m',
                               validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
+    active = models.BooleanField(default=True)
+
     tags = models.ManyToManyField('Tag', related_name='post_tag', blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['-created_date']
 
     def __str__(self):
         return self.title
 
-    def num_likes(self):
-        return self.liked.all().count()
-
-    def count_comments(self):
-        return self.comment_set.all().count
-
-    class Meta:
-        ordering = ['-created_date']
+    # def num_likes(self):
+    #     return self.liked.all().count()
+    #
+    # def count_comments(self):
+    #     return self.comment_set.all().count
 
 
 LIKE_CHOICES = (
@@ -71,11 +73,11 @@ class Action(ActionBase):
     type = models.PositiveSmallIntegerField(choices=ACTIONS, default=LIKE)
     active = models.BooleanField(default=True)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user}-{self.post}-{self.type}"
+        return f"{self.creator}-{self.post}-{self.type}"
 
 
 class Comment(models.Model):
