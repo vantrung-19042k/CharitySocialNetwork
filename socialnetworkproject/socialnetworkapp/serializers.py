@@ -23,13 +23,13 @@ class UserSerializer(ModelSerializer):
 class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
-        fields = ["id", "name"]
+        fields = ['id', 'name']
 
 
 class ActionSerializer(ModelSerializer):
     class Meta:
         model = Action
-        fields = ['type', 'updated_date', 'creator', 'post']
+        fields = ['id', 'type', 'updated_date', 'creator', 'post']
 
 
 class CommentSerializer(ModelSerializer):
@@ -48,26 +48,25 @@ class PostSerializer(ModelSerializer):
 
 
 class ReportSerializer(ModelSerializer):
-    user_create_report = UserSerializer()
-    user_is_reported = UserSerializer()
+    # user_create_report = UserSerializer()
+    # user_is_reported = UserSerializer()
 
     class Meta:
         model = Report
-        fields = ['image', 'reason', 'reported_date', 'user_create_report', 'user_is_reported']
+        fields = ['image', 'reason', 'reported_date', 'updated_date', 'user_create_report', 'user_is_reported']
 
 
 class AuctionItemSerializer(ModelSerializer):
-    user_sell = UserSerializer()
+    # user_sell = UserSerializer()
 
     class Meta:
         model = AuctionItem
-        fields = ['name', 'description', 'image', 'user_sell']
+        fields = ['name', 'image', 'price', 'user_sell', 'post']
 
 
 class TransactionSerializer(ModelSerializer):
-    user_buy = UserSerializer()
-    items = AuctionItemSerializer()
+    # user_buy = UserSerializer()
 
     class Meta:
         model = Transaction
-        fields = ['transaction_date', 'started_price', 'last_price', 'items', 'user_buy']
+        fields = ['transaction_date', 'updated_date', 'started_price', 'last_price', 'items', 'user_buy']

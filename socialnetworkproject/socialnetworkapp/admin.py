@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django import forms
-# from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 from .models import *
 
@@ -69,11 +69,11 @@ class ReportAdmin(admin.ModelAdmin):
 
 
 class AuctionItemAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'description', 'image', 'user_sell']
+    list_display = ['id', 'name', 'image', 'price', 'user_sell', 'post']
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'transaction_date', 'started_price', 'last_price', 'items', 'user_buy']
+    list_display = ['id', 'transaction_date', 'updated_date', 'started_price', 'last_price', 'items', 'user_buy']
 
 
 admin.site.register(User, UserAdmin)

@@ -155,7 +155,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class ActionViewSet(viewsets.ModelViewSet):
     queryset = Action.objects.all()
-    serializer_class = Action
+    serializer_class = ActionSerializer
 
 
 class ReportViewSet(viewsets.ModelViewSet):

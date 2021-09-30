@@ -84,7 +84,7 @@ class Action(ActionBase):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.creator}-{self.post}-{self.type}"
+        return self.type
 
 
 class Comment(models.Model):
@@ -107,26 +107,37 @@ class Report(models.Model):
     image = models.ImageField(upload_to='uploads/reports/%Y/%m',
                               validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
     reported_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
     user_create_report = models.ForeignKey(User, on_delete=models.SET_NULL,
                                            null=True, related_name='user_create_report')
     user_is_reported = models.ForeignKey(User, on_delete=models.SET_NULL,
                                          null=True, related_name='user_is_reported')
 
+    # admin get image
+    def admin_image(self):
+        return '<img src="%s"/>' % self.image
+
 
 class AuctionItem(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(max_length=300, blank=True, null=True)
-    image = models.ImageField(upload_to='uploads/aution_items/%Y/%m',
+    image = models.ImageField(upload_to='uploads/auction_items/%Y/%m',
                               validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
-    user_sell = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    price = models.FloatField(null=True, blank=True)
+
+    user_sell = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_sell_item", default=None)
+    post = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # admin get image
+    def admin_image(self):
+        return '<img src="%s"/>' % self.image
 
 
 class Transaction(models.Model):
-    items = models.ForeignKey(AuctionItem, on_delete=models.CASCADE)
-
     transaction_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
     started_price = models.FloatField(null=True, blank=True)
     last_price = models.FloatField(null=True, blank=True)
 
     user_buy = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    items = models.ForeignKey(AuctionItem, on_delete=models.CASCADE)
