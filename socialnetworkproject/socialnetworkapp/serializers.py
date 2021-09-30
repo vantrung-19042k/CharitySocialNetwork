@@ -44,7 +44,7 @@ class PostSerializer(ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_date', 'updated_date', 'image', 'active', 'tags', 'creator']
+        fields = ['id', 'content', 'created_date', 'updated_date', 'image', 'active', 'tags', 'creator']
 
 
 class ReportSerializer(ModelSerializer):

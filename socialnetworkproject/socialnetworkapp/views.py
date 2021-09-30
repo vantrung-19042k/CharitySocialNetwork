@@ -69,15 +69,14 @@ class PostListCreateViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Cre
         return [permissions.AllowAny()]
 
     def create(self, request, *args, **kwargs):
-        title = request.data.get('title')
         content = request.data.get('content')
         image = request.FILES.get('image')
         creator = self.request.user
 
-        if title is None or title == "" or content is None or content == "":
+        if content is None or content == "":
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            post = Post.objects.create(title=title, creator=creator, content=content, image=image)
+            post = Post.objects.create(creator=creator, content=content, image=image)
             post.save()
             return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
 
@@ -146,6 +145,12 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
         else:
             action_post = Action.objects.create(type=action_type, creator=request.user, post=self.get_object())
             return Response(ActionSerializer(action_post).data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path='get-comments')
+    def get_comments(self, request, pk):
+        post = self.get_object()
+        return Response(CommentSerializer(post.comments.order_by('-id').all(), many=True,
+                                          context={"request": self.request}).data, status=status.HTTP_201_CREATED)
 
 
 class TagViewSet(viewsets.ModelViewSet):

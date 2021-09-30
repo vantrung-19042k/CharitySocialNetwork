@@ -59,7 +59,7 @@ class PostContentForm(forms.ModelForm):
 
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'content', 'created_date', 'updated_date', 'image', 'active', 'creator']
+    list_display = ['id', 'content', 'created_date', 'updated_date', 'image', 'active', 'creator']
     inlines = [ActionInlinePostAdmin, CommentInlinePostAdmin]
     form = PostContentForm
 

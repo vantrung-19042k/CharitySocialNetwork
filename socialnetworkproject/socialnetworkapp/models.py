@@ -23,9 +23,7 @@ class Tag(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=100, blank=True)
     content = models.TextField(max_length=1000, blank=True)
-    liked = models.ManyToManyField(User, blank=True, related_name='likes')
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='uploads/posts/%Y/%m',
@@ -39,7 +37,7 @@ class Post(models.Model):
         ordering = ['-created_date']
 
     def __str__(self):
-        return self.title
+        return self.content
 
     # admin get image
     def admin_image(self):
@@ -93,7 +91,7 @@ class Comment(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
 
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
 
     def __str__(self):
         return str(self.pk)
