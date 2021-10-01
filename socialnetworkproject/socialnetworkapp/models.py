@@ -129,7 +129,7 @@ class AuctionItem(models.Model):
     price = models.FloatField(null=True, blank=True)
 
     user_sell = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_sell_item", default=None)
-    post = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, related_name="item")
 
     # admin get image
     def admin_image(self):

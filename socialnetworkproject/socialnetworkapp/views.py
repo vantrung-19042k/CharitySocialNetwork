@@ -152,6 +152,21 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
         return Response(CommentSerializer(post.comments.order_by('-id').all(), many=True,
                                           context={"request": self.request}).data, status=status.HTTP_201_CREATED)
 
+    @action(methods=['post'], detail=True, url_path='add-item')
+    def add_item(self, request, pk):
+        name = request.data.get('name')
+        image = request.FILES.get('image')
+        price = request.data.price('price')
+        if name and image and price:
+            item = AuctionItem.objects.create(name=name,
+                                              image=image,
+                                              user_sell=request.user,
+                                              post=self.get_object())
+            return Response(AuctionItemSerializer(item).data,
+                            status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 class ReportViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAPIView, generics.RetrieveAPIView):
     queryset = Report.objects.all()
@@ -191,19 +206,19 @@ class ReportViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAP
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
+class AuctionItemViewSet(viewsets.ModelViewSet):
+    queryset = AuctionItem.objects.all()
+    serializer_class = AuctionItemSerializer
+
+
 class TagViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
-class ActionViewSet(viewsets.ModelViewSet):
+class ActionViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-
-
-class AuctionItemViewSet(viewsets.ModelViewSet):
-    queryset = AuctionItem.objects.all()
-    serializer_class = AuctionItemSerializer
 
 
 class TransactionViewSet(viewsets.ModelViewSet):

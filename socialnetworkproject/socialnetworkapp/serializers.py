@@ -1,5 +1,3 @@
-
-
 from rest_framework.serializers import ModelSerializer
 from .models import User, Tag, Action, Comment, Post, Report, AuctionItem, Transaction
 
@@ -44,6 +42,14 @@ class CommentSerializer(ModelSerializer):
         fields = ['id', 'content', 'created_date', 'updated_date', 'creator', 'post']
 
 
+class AuctionItemSerializer(ModelSerializer):
+    # user_sell = UserSerializer()
+
+    class Meta:
+        model = AuctionItem
+        fields = ['id', 'name', 'image', 'price', 'user_sell', 'post']
+
+
 class PostSerializer(ModelSerializer):
     tags = TagSerializer(many=True, required=False)
     creator = UserSerializer()
@@ -60,14 +66,6 @@ class ReportSerializer(ModelSerializer):
     class Meta:
         model = Report
         fields = ['id', 'image', 'reason', 'reported_date', 'updated_date', 'creator', 'user_is_reported']
-
-
-class AuctionItemSerializer(ModelSerializer):
-    # user_sell = UserSerializer()
-
-    class Meta:
-        model = AuctionItem
-        fields = ['id', 'name', 'image', 'price', 'user_sell', 'post']
 
 
 class TransactionSerializer(ModelSerializer):
