@@ -88,7 +88,7 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get_permissions(self):
-        if self.action in ['add_comment', 'take_action']:
+        if self.action in ['add_comment', 'take_action', 'add_item']:
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
@@ -156,10 +156,11 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
     def add_item(self, request, pk):
         name = request.data.get('name')
         image = request.FILES.get('image')
-        price = request.data.price('price')
-        if name and image and price:
+        price = request.data.get('price')
+        if name:
             item = AuctionItem.objects.create(name=name,
                                               image=image,
+                                              price=price,
                                               user_sell=request.user,
                                               post=self.get_object())
             return Response(AuctionItemSerializer(item).data,
@@ -174,7 +175,7 @@ class ReportViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAP
 
     def get_permissions(self):
         if self.action in ['create', 'destroy', 'retrieve']:
-            return [permissions.IsAuthenticated()]
+            return [permissions.IsAuthenticated(), ]
 
         return [permissions.AllowAny()]
 
@@ -206,9 +207,31 @@ class ReportViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAP
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-class AuctionItemViewSet(viewsets.ModelViewSet):
+class AuctionItemViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = AuctionItem.objects.all()
     serializer_class = AuctionItemSerializer
+
+    def get_permissions(self):
+        if self.action in ['add_price', ]:
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
+
+    @action(methods=['post'], detail=True, url_path='add-price')
+    def add_price(self, request, pk):
+        price = request.data.get('price')
+        if price:
+            auction_price = AuctionPrice.objects.create(price=price,
+                                                        bidder=request.user,
+                                                        auction_item=self.get_object())
+
+            return Response(AuctionPriceSerializer(auction_price).data,
+                            status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# # # #
 
 
 class TagViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -221,6 +244,28 @@ class ActionViewSet(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = ActionSerializer
 
 
-class TransactionViewSet(viewsets.ModelViewSet):
+class TransactionViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+
+    def get_permissions(self):
+        if self.action in ['create']:
+            return [permissions.IsAuthenticated(), ]
+        return [permissions.AllowAny()]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            started_price = request.data.get('started_price')
+            last_price = request.data.get('last_price')
+            user_id = request.data.get('user_id')
+            item_id = request.data.get('item_id')
+            user_buy = User.objects.get(pk=user_id)
+            item = AuctionItem.objects.get(pk=item_id)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            transaction = Transaction.objects.create(started_price=started_price, last_price=last_price,
+                                                     user_buy=user_buy,
+                                                     item=item)
+            transaction.save()
+            return Response(self.serializer_class(transaction).data, status=status.HTTP_201_CREATED)

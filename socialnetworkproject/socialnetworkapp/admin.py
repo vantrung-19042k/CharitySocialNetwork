@@ -68,8 +68,18 @@ class ReportAdmin(admin.ModelAdmin):
     list_display = ['id', 'reason', 'image', 'reported_date', 'creator', 'user_is_reported']
 
 
+class PriceInlineItemAdmin(admin.StackedInline):
+    model = AuctionPrice
+    fk_name = 'auction_item'
+
+
+class AuctionPriceAdmin(admin.ModelAdmin):
+    list_display = ['id', 'price', 'bidder']
+
+
 class AuctionItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'image', 'price', 'user_sell', 'post']
+    inlines = [PriceInlineItemAdmin, ]
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -77,11 +87,14 @@ class TransactionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User, UserAdmin)
-admin.site.register(Post, PostAdmin)
+
 admin.site.register(Tag, TagAdmin)
+admin.site.register(Post, PostAdmin)
 admin.site.register(Action, ActionAdmin)
 admin.site.register(Comment, CommentAdmin)
-admin.site.register(Report)
-admin.site.register(AuctionItem)
-admin.site.register(Transaction)
 
+admin.site.register(AuctionItem, AuctionItemAdmin)
+admin.site.register(AuctionPrice, AuctionPriceAdmin)
+
+admin.site.register(Report, ReportAdmin)
+admin.site.register(Transaction, TransactionAdmin)

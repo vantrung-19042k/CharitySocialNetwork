@@ -10,7 +10,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/users/%Y/%m',
                                validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
     is_admin = models.BooleanField(default=False)
-    birthday = models.DateTimeField(default=None, blank=True)
+    birthday = models.DateTimeField(default=None, blank=True, null=True)
     phone = models.CharField(max_length=11, blank=True)
 
     def __str__(self):
@@ -135,6 +135,19 @@ class AuctionItem(models.Model):
     def admin_image(self):
         return '<img src="%s"/>' % self.image
 
+    def __str__(self):
+        return self.name
+
+
+class AuctionPrice(models.Model):
+    price = models.FloatField()
+    bidder = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='auction_price_bidder')
+
+    auction_item = models.ForeignKey(AuctionItem, on_delete=models.CASCADE, blank=True, null=True, default=None)
+
+    def __str__(self):
+        return self.bidder.username + " - " + str(self.price)
+
 
 class Transaction(models.Model):
     transaction_date = models.DateTimeField(auto_now_add=True)
@@ -144,3 +157,6 @@ class Transaction(models.Model):
 
     user_buy = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     item = models.ForeignKey(AuctionItem, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.item.name
