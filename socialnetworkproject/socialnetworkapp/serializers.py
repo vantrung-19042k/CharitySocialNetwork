@@ -1,11 +1,17 @@
+
+
 from rest_framework.serializers import ModelSerializer
 from .models import User, Tag, Action, Comment, Post, Report, AuctionItem, Transaction
 
+from rest_framework import serializers
+
 
 class UserSerializer(ModelSerializer):
+    birthday = serializers.DateTimeField(format="%d/%m/%Y", input_formats=['%d/%m/%Y', ], default_timezone=None)
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'password', 'avatar', 'date_joined']
+        fields = ['id', 'first_name', 'last_name', 'email', 'birthday', 'username', 'password', 'avatar', 'date_joined']
 
         # hide password when get data
         extra_kwargs = {
@@ -53,7 +59,7 @@ class ReportSerializer(ModelSerializer):
 
     class Meta:
         model = Report
-        fields = ['image', 'reason', 'reported_date', 'updated_date', 'user_create_report', 'user_is_reported']
+        fields = ['id', 'image', 'reason', 'reported_date', 'updated_date', 'creator', 'user_is_reported']
 
 
 class AuctionItemSerializer(ModelSerializer):
@@ -61,7 +67,7 @@ class AuctionItemSerializer(ModelSerializer):
 
     class Meta:
         model = AuctionItem
-        fields = ['name', 'image', 'price', 'user_sell', 'post']
+        fields = ['id', 'name', 'image', 'price', 'user_sell', 'post']
 
 
 class TransactionSerializer(ModelSerializer):
@@ -69,4 +75,4 @@ class TransactionSerializer(ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ['transaction_date', 'updated_date', 'started_price', 'last_price', 'items', 'user_buy']
+        fields = ['id', 'transaction_date', 'updated_date', 'started_price', 'last_price', 'item', 'user_buy']

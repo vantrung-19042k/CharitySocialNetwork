@@ -65,7 +65,7 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ['reason', 'image', 'reported_date', 'user_create_report', 'user_is_reported']
+    list_display = ['id', 'reason', 'image', 'reported_date', 'creator', 'user_is_reported']
 
 
 class AuctionItemAdmin(admin.ModelAdmin):
@@ -73,7 +73,7 @@ class AuctionItemAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'transaction_date', 'updated_date', 'started_price', 'last_price', 'items', 'user_buy']
+    list_display = ['id', 'transaction_date', 'updated_date', 'started_price', 'last_price', 'item', 'user_buy']
 
 
 admin.site.register(User, UserAdmin)

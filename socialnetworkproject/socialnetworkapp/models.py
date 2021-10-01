@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
 
+
 # from ckeditor.fields import RichTextField
 
 
@@ -9,6 +10,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/users/%Y/%m',
                                validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])], blank=True)
     is_admin = models.BooleanField(default=False)
+    birthday = models.DateTimeField(default=None, blank=True)
     phone = models.CharField(max_length=11, blank=True)
 
     def __str__(self):
@@ -37,7 +39,7 @@ class Post(models.Model):
         ordering = ['-created_date']
 
     def __str__(self):
-        return self.content
+        return self.content[:20]
 
     # admin get image
     def admin_image(self):
@@ -99,7 +101,7 @@ class Comment(models.Model):
 
 class Report(models.Model):
     class Meta:
-        unique_together = ('user_create_report', 'user_is_reported')
+        unique_together = ('creator', 'user_is_reported')
 
     reason = models.TextField(max_length=300, null=False)
     image = models.ImageField(upload_to='uploads/reports/%Y/%m',
@@ -107,10 +109,13 @@ class Report(models.Model):
     reported_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
-    user_create_report = models.ForeignKey(User, on_delete=models.SET_NULL,
-                                           null=True, related_name='user_create_report')
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL,
+                                null=True, related_name='user_create_report')
     user_is_reported = models.ForeignKey(User, on_delete=models.SET_NULL,
                                          null=True, related_name='user_is_reported')
+
+    def __str__(self):
+        return self.reason[:20]
 
     # admin get image
     def admin_image(self):
@@ -138,4 +143,4 @@ class Transaction(models.Model):
     last_price = models.FloatField(null=True, blank=True)
 
     user_buy = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    items = models.ForeignKey(AuctionItem, on_delete=models.CASCADE)
+    item = models.ForeignKey(AuctionItem, on_delete=models.CASCADE)

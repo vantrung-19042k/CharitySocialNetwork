@@ -136,7 +136,7 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True, url_path='like')
+    @action(methods=['post'], detail=True, url_path='take-action')
     def take_action(self, request, pk):
         try:
             action_type = int(request.data['type'])
@@ -153,7 +153,45 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
                                           context={"request": self.request}).data, status=status.HTTP_201_CREATED)
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class ReportViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.DestroyAPIView, generics.RetrieveAPIView):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+
+    def get_permissions(self):
+        if self.action in ['create', 'destroy', 'retrieve']:
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
+
+    def retrieve(self, request, *args, **kwargs):
+        if request.user == self.get_object().creator:
+            return super().retrieve(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            reason = request.data.get('reason')
+            image = request.FILES.get('image')
+            creator = self.request.user
+            user_id = request.data.get('user_id')
+            user_is_reported = User.objects.get(pk=user_id)
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            report = Report.objects.create(reason=reason, image=image, creator=creator,
+                                           user_is_reported=user_is_reported)
+            report.save()
+            return Response(self.serializer_class(report).data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user == self.get_object().creator:
+            return super().destroy(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class TagViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
@@ -161,11 +199,6 @@ class TagViewSet(viewsets.ModelViewSet):
 class ActionViewSet(viewsets.ModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-
-
-class ReportViewSet(viewsets.ModelViewSet):
-    queryset = Report.objects.all()
-    serializer_class = ReportSerializer
 
 
 class AuctionItemViewSet(viewsets.ModelViewSet):
