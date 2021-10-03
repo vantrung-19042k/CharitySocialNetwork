@@ -9,7 +9,8 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'birthday', 'username', 'password', 'avatar', 'date_joined']
+        fields = ['id', 'first_name', 'last_name', 'email', 'birthday', 'username', 'password', 'avatar', 'date_joined',
+                  'phone', 'gender']
 
         # hide password when get data
         extra_kwargs = {

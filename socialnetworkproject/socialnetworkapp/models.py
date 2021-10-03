@@ -12,6 +12,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     birthday = models.DateTimeField(default=None, blank=True, null=True)
     phone = models.CharField(max_length=11, blank=True)
+    gender = models.CharField(max_length=20, blank=True, default=None)
 
     def __str__(self):
         return self.username
