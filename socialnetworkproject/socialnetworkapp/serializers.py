@@ -1,3 +1,4 @@
+from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 from .models import *
 
@@ -5,7 +6,7 @@ from rest_framework import serializers
 
 
 class UserSerializer(ModelSerializer):
-    birthday = serializers.DateTimeField(format="%d/%m/%Y", input_formats=['%d/%m/%Y', ], default_timezone=None)
+    birthday = serializers.DateTimeField(format="%d-%m-%Y", input_formats=['%d-%m-%Y', ], default_timezone=None)
 
     class Meta:
         model = User
@@ -38,6 +39,11 @@ class ActionSerializer(ModelSerializer):
 
 
 class CommentSerializer(ModelSerializer):
+    creator = SerializerMethodField()
+
+    def get_creator(self, comment):
+        return UserSerializer(comment.creator, context={"request": self.context.get('request')}).data
+
     class Meta:
         model = Comment
         fields = ['id', 'content', 'created_date', 'updated_date', 'creator', 'post']
@@ -61,6 +67,17 @@ class AuctionPriceSerializer(ModelSerializer):
 class PostSerializer(ModelSerializer):
     tags = TagSerializer(many=True, required=False)
     creator = UserSerializer()
+    image = SerializerMethodField()
+
+    def get_image(self, post):
+        request = self.context['request']
+        name = post.image.name
+        if name.startswith("static/"):
+            path = '/%s' % name
+        else:
+            path = '/static/%s' % name
+
+        return request.build_absolute_uri(path)
 
     class Meta:
         model = Post

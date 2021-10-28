@@ -58,4 +58,4 @@ urlpatterns = [
     path('oauth2-info/', views.AuthInfo.as_view())
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) --test

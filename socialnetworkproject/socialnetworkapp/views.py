@@ -71,14 +71,24 @@ class PostListCreateViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Cre
     def create(self, request, *args, **kwargs):
         content = request.data.get('content')
         image = request.FILES.get('image')
+        tags = request.data.get('tags')
         creator = self.request.user
 
         if content is None or content == "":
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            post = Post.objects.create(creator=creator, content=content, image=image)
-            post.save()
-            return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
+            if tags is None or tags == "":
+                post = Post.objects.create(creator=creator, content=content, image=image)
+                post.save()
+                return Response(self.serializer_class(post, context={"request": self.request}).data, status=status.HTTP_201_CREATED)
+            else:
+                post = Post.objects.create(creator=creator, content=content, image=image)
+                tag = Tag.objects.get_or_create(name=tags)
+                t = Tag.objects.get(name=tags)
+                post.tags.add(t)
+                post.save()
+                return Response(self.serializer_class(post, context={"request": self.request}).data,
+                                status=status.HTTP_201_CREATED)
 
 
 class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAPIView,
@@ -108,6 +118,23 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
+    # @action(methods=['post'], detail=True, url_path="add-tags")
+    # def add_tag(self, request, pk):
+    #     try:
+    #         post = self.get_object()
+    #     except Http404:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
+    #     else:
+    #         tags = request.data.get("tags")
+    #         if tags is not None:
+    #             for tag in tags:
+    #                 t, _ = Tag.objects.get_or_create(name=tag)
+    #                 post.tags.add(t)
+    #             post.save()
+    #
+    #             return Response(self.serializer_class(post, context={"request": self.request}).data,
+    #                                                             status=status.HTTP_201_CREATED)
+
     @action(methods=['post'], detail=True, url_path="add-tags")
     def add_tag(self, request, pk):
         try:
@@ -117,12 +144,12 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
         else:
             tags = request.data.get("tags")
             if tags is not None:
-                for tag in tags:
-                    t, _ = Tag.objects.get_or_create(name=tag)
-                    post.tags.add(t)
+                t = Tag.objects.create(name=tags)
+                post.tags.add(t)
                 post.save()
 
-                return Response(self.serializer_class(post).data, status=status.HTTP_201_CREATED)
+                return Response(self.serializer_class(post, context={"request": self.request}).data,
+                                                                status=status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=True, url_path='add-comment')
     def add_comment(self, request, pk):

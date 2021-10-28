@@ -60,9 +60,10 @@ OAUTH2_INFO = {
     "client_secret": "Asllx0IlBm8MtFKm4bVrTjLAtZzAHVfqC5s2Bo3mrxuj6hfChT2r6LjeGSAE3BIQFHGGkqv7Bc5l8NRufT63BTwLpM4jMvoONIlMhpTjdSXG4NDl8rWHmcZeX1OPKJhe",
 }
 
-# OAUTH2_PROVIDER = {
-#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
-# }
+
+OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+}
 
 
 MIDDLEWARE = [
@@ -82,6 +83,8 @@ AUTH_USER_MODEL = 'socialnetworkapp.User'
 ROOT_URLCONF = 'socialnetworkproject.urls'
 
 CKEDITOR_UPLOAD_PATH = "uploads/others/"
+
+MEDIA_ROOT = '%s/socialnetworkapp/static/' % BASE_DIR
 
 CORS_ORIGIN_ALLOW_ALL = True
 

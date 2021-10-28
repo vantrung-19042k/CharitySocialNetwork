@@ -4,6 +4,7 @@ from django.core.validators import FileExtensionValidator
 
 
 # from ckeditor.fields import RichTextField
+from django.utils.safestring import mark_safe
 
 
 class User(AbstractUser):
@@ -43,10 +44,10 @@ class Post(models.Model):
         return self.content[:20]
 
     # admin get image
-    def admin_image(self):
-        return '<img src="%s"/>' % self.image
+    # def admin_image(self):
+    #     return '<img src="%s"/>' % self.image
+    # admin_image.allow_tags = True
 
-    admin_image.allow_tags = True
 
     # def num_likes(self):
     #     return self.liked.all().count()

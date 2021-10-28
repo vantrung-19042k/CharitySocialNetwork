@@ -14,7 +14,7 @@ class CharitySocialNetwork(admin.AdminSite):
 
 
 class UserAdmin(admin.ModelAdmin):
-    readonly_fields = ['avatar']
+    # readonly_fields = ['avatar']
 
     def avatar(self, obj):
         if obj:
@@ -59,6 +59,7 @@ class PostContentForm(forms.ModelForm):
 
 
 class PostAdmin(admin.ModelAdmin):
+
     list_display = ['id', 'content', 'created_date', 'updated_date', 'image', 'active', 'creator']
     inlines = [ActionInlinePostAdmin, CommentInlinePostAdmin]
     form = PostContentForm
