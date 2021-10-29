@@ -6,7 +6,18 @@ from rest_framework import serializers
 
 
 class UserSerializer(ModelSerializer):
-    birthday = serializers.DateTimeField(format="%d-%m-%Y", input_formats=['%d-%m-%Y', ], default_timezone=None)
+    birthday = serializers.DateTimeField(format="%d-%m-%Y", input_formats=['%Y-%m-%d', ], default_timezone=None)
+    avatar = SerializerMethodField()
+
+    def get_avatar(self, user):
+        request = self.context['request']
+        name = user.avatar.name
+        if name.startswith("static/"):
+            path = '/%s' % name
+        else:
+            path = '/static/%s' % name
+
+        return request.build_absolute_uri(path)
 
     class Meta:
         model = User

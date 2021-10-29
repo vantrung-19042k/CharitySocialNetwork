@@ -30,7 +30,28 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
 
     @action(methods=['get'], detail=False, url_path="current-user")
     def get_current_user(self, request):
-        return Response(self.serializer_class(request.user).data, status=status.HTTP_200_OK)
+        return Response(self.serializer_class(request.user, context={"request": self.request}).data,
+                                                            status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        gender = request.data.get('gender')
+        email = request.data.get('email')
+        phone = request.data.get('phone')
+        birthday = request.data.get('birthday')
+        username = request.data.get('username')
+        password = request.data.get('password')
+        avatar = request.FILES.get('avatar')
+
+        user = User.objects.create(username=username, password=password,
+                                   email=email, first_name=first_name,
+                                   last_name=last_name, gender=gender,
+                                   phone=phone, avatar=avatar, birthday=birthday)
+        user.save()
+
+        return Response(self.serializer_class(user, context={"request": self.request}).data,
+                        status=status.HTTP_201_CREATED)
 
 
 class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateAPIView):
@@ -52,7 +73,7 @@ class CommentViewSet(viewsets.ViewSet, generics.DestroyAPIView, generics.UpdateA
 
 
 class PostPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 30
 
 
 class PostListCreateViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
@@ -80,7 +101,8 @@ class PostListCreateViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Cre
             if tags is None or tags == "":
                 post = Post.objects.create(creator=creator, content=content, image=image)
                 post.save()
-                return Response(self.serializer_class(post, context={"request": self.request}).data, status=status.HTTP_201_CREATED)
+                return Response(self.serializer_class(post, context={"request": self.request}).data,
+                                status=status.HTTP_201_CREATED)
             else:
                 post = Post.objects.create(creator=creator, content=content, image=image)
                 tag = Tag.objects.get_or_create(name=tags)
@@ -149,7 +171,7 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
                 post.save()
 
                 return Response(self.serializer_class(post, context={"request": self.request}).data,
-                                                                status=status.HTTP_201_CREATED)
+                                status=status.HTTP_201_CREATED)
 
     @action(methods=['post'], detail=True, url_path='add-comment')
     def add_comment(self, request, pk):
