@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.http import Http404
 
+from django.contrib.auth.hashers import make_password
+
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -31,8 +33,9 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
     @action(methods=['get'], detail=False, url_path="current-user")
     def get_current_user(self, request):
         return Response(self.serializer_class(request.user, context={"request": self.request}).data,
-                                                            status=status.HTTP_200_OK)
+                        status=status.HTTP_200_OK)
 
+    # create a new user
     def create(self, request, *args, **kwargs):
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
@@ -41,7 +44,7 @@ class UserViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView
         phone = request.data.get('phone')
         birthday = request.data.get('birthday')
         username = request.data.get('username')
-        password = request.data.get('password')
+        password = make_password(request.data.get('password'))
         avatar = request.FILES.get('avatar')
 
         user = User.objects.create(username=username, password=password,
@@ -127,9 +130,46 @@ class PostViewSet(viewsets.ViewSet, generics.RetrieveAPIView, generics.DestroyAP
 
     def partial_update(self, request, *args, **kwargs):
         if request.user == self.get_object().creator:
-            return super().partial_update(request, *args, **kwargs)
+            content = request.data.get('content')
+            image = request.FILES.get('image')
+            new_tags = request.data.get('new_tags')
+            old_tags = request.data.get('old_tags')
+
+            ot = Tag.objects.get(name=old_tags)
+
+            nt = Tag.objects.get(name=new_tags)
+            if nt is None:
+                nt = Tag.objects.create(name=new_tags)
+                nt.save()
+
+            post = self.get_object()
+            post.content = content
+            post.image = image
+            post.tags.remove(ot)
+            post.tags.add(nt)
+            post.save()
+
+            return Response(self.serializer_class(post, context={"request": self.request}).data,
+                            status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_403_FORBIDDEN)
+
+    # def partial_update(self, request, *args, **kwargs):
+    #     if request.user == self.get_object().creator:
+    #         content = request.data.get('content')
+    #         image = request.FILES.get('image')
+    #         tags = request.data.get('tags')
+    #
+    #         t = Tag.objects.get_or_create(name=tags)
+    #
+    #         post = self.get_object()
+    #         post.tags.add(t)
+    #         post.save()
+    #
+    #         return Response(self.serializer_class(post, context={"request": self.request}).data,
+    #                         status=status.HTTP_201_CREATED)
+    #
+    #     return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, *args, **kwargs):
         if request.user == self.get_object().creator:
